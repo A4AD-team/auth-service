@@ -18,7 +18,7 @@ pre-commit:
 
 commit-msg:
   scripts:
-    "validate-commit-msg.sh":
+    ".lefthook/validate-commit-msg.sh":
       runner: bash
 
 pre-push:
