@@ -1,0 +1,77 @@
+# Lefthook Git Hooks Configuration
+# Enforces Git Flow conventions and protects important branches
+
+pre-commit:
+  commands:
+    # Run Java code formatting and checks
+    java-format:
+      run: mvn spotless:check
+      glob: "{*.java,src/**/*.java}"
+    
+    # Run tests on staged files
+    test-staged:
+      run: mvn test -Dtest=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.java$' | sed 's/.*\/\([^/]*\)\.java/\1Test/' | tr '\n' ',')
+      glob: "*.java"
+      skip:
+        - merge
+        - rebase
+
+commit-msg:
+  scripts:
+    ".lefthook/validate-commit-msg.sh":
+      runner: bash
+
+pre-push:
+  # Block pushes to protected branches completely
+  skip:
+    - ref: main
+    - ref: master
+    - ref: develop
+    - ref: release/*
+    - ref: hotfix/*
+  
+  scripts:
+    "validate-branch-name.sh":
+      runner: bash
+    
+    # Run full test suite before push
+    run-tests:
+      run: mvn test
+      skip:
+        - env: SKIP_TESTS=1
+    
+    # Check for dependency updates
+    check-deps:
+      run: mvn versions:display-dependency-updates
+      skip: true  # Optional, set to false to enable
+
+# Local development hooks (stricter validation)
+# Copy to lefthook-local.yml and uncomment for stricter local rules
+#
+# pre-commit:
+#   commands:
+#     java-format-fix:
+#       run: mvn spotless:apply
+#       glob: "*.java"
+#     
+#     comprehensive-tests:
+#       run: mvn test
+#       glob: "*.java"
+#
+# pre-push:
+#   skip:
+#     - ref: main
+#     - ref: master  
+#     - ref: develop
+#     - ref: release/*
+#     - ref: hotfix/*
+#   commands:
+#     security-scan:
+#       run: mvn dependency-check:check
+#       skip:
+#         - env: SKIP_SECURITY=1
+#     
+#     quality-gate:
+#       run: mvn sonar:sonar
+#       skip:
+#         - env: SKIP_SONAR=1

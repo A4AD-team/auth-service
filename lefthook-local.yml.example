@@ -1,0 +1,59 @@
+# Lefthook Local Configuration
+# Stricter validation for local development
+# Copy this file to lefthook-local.yml for enhanced local rules
+
+pre-commit:
+  commands:
+    # Auto-format Java code before commit
+    java-format-fix:
+      run: mvn spotless:apply
+      glob: "*.java"
+    
+    # Run comprehensive tests locally
+    comprehensive-tests:
+      run: mvn test
+      glob: "*.java"
+      skip:
+        - merge
+        - rebase
+    
+    # Additional code quality checks
+    code-quality:
+      run: mvn checkstyle:check
+      glob: "*.java"
+      skip:
+        - merge
+        - rebase
+
+pre-push:
+  # Still block protected branches
+  skip:
+    - ref: main
+    - ref: master
+    - ref: develop
+    - ref: release/*
+    - ref: hotfix/*
+  
+  scripts:
+    "validate-branch-name.sh":
+      runner: bash
+  
+  commands:
+    # Security scan before push
+    security-scan:
+      run: mvn dependency-check:check
+      skip:
+        - env: SKIP_SECURITY=1
+    
+    # Full test suite with coverage
+    full-tests:
+      run: mvn clean test jacoco:report
+      skip:
+        - env: SKIP_TESTS=1
+    
+    # SonarQube quality gate (if configured)
+    sonar-scan:
+      run: mvn sonar:sonar
+      skip:
+        - env: SKIP_SONAR=1
+        - env: SONAR_HOST_URL=
