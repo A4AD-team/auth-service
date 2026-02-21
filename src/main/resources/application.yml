@@ -1,0 +1,50 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:iam}
+    username: ${DB_USER:iam}
+    password: ${DB_PASSWORD:iam}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc.time_zone: UTC
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: iam-service
+  tracing:
+    sampling:
+      probability: 1.0
+
+app:
+  jwt:
+    access-secret: ${JWT_ACCESS_SECRET:changeit-changeit-changeit-changeit}
+    refresh-secret: ${JWT_REFRESH_SECRET:changeit-changeit-changeit-changeit-refresh}
+    access-ttl-minutes: ${JWT_ACCESS_TTL_MINUTES:15}
+    refresh-ttl-minutes: ${JWT_REFRESH_TTL_MINUTES:10080}
+    issuer: ${JWT_ISSUER:iam-service}
+  bootstrap:
+    admin:
+      email: ${BOOTSTRAP_ADMIN_EMAIL:}
+      password: ${BOOTSTRAP_ADMIN_PASSWORD:}
+      full-name: ${BOOTSTRAP_ADMIN_FULL_NAME:}
