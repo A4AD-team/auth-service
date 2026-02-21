@@ -1,99 +1,61 @@
-# Auth Service
+# IAM Service
 
-Микросервис аутентификации и управления пользователями / ролями / правами доступа.
+Central Identity & Access Management (IAM) service for a microservices project.
 
-[![Java](https://img.shields.io/badge/Java-21-blue?logo=openjdk)](https://openjdk.org/)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3+-green)](https://spring.io/projects/spring-boot)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16+-blue)](https://www.postgresql.org/)
-
-## Назначение
-
-Центральный сервис Identity & Access Management (IAM):
-
-- Регистрация / авторизация пользователей
-- JWT-токены (access + refresh)
-- Управление ролями, департаментами, правами
-
-## Технологический стек
-
+## Stack
 - Java 21
-- Spring Boot 3.3+
-- Spring Security + OAuth2 / JWT
+- Spring Boot 3.3
+- Spring Security + OAuth2 Resource Server (JWT)
 - Spring Data JPA + Hibernate
-- PostgreSQL 16+ (JSONB для custom claims)
-- Liquibase / Flyway для миграций
-- OpenTelemetry + Prometheus для observability
+- PostgreSQL 16 (JSONB for custom claims)
+- Flyway migrations
+- OpenTelemetry + Prometheus
 - Docker + Compose
 
-## Структура проекта
-
-```
-auth-service/
-├── src/
-│ ├── main/
-│ │ ├── java/com/company/auth/
-│ │ └── resources/
-│ └── test/
-├── src/main/resources/db/migration/
-├── pom.xml
-├── Dockerfile
-└── docker-compose.yml
-```
-
-## Быстрый старт (local)
-
+## Quick Start (Docker Compose)
 ```bash
-# 1. PostgreSQL (docker)
-docker run -d --name auth-postgres \
-  -e POSTGRES_USER=auth \
-  -e POSTGRES_PASSWORD=authsecret \
-  -e POSTGRES_DB=auth_db \
-  -p 5432:5432 postgres:16
-
-# 2. Запуск
-mvn clean spring-boot:run \
-  -Dspring.profiles.active=local \
-  -Dspring.datasource.url=jdbc:postgresql://localhost:5432/auth_db
+docker compose up --build
 ```
 
-## Docker Compose пример
+The stack starts PostgreSQL and the IAM service on `http://localhost:8080`.
 
-```yaml
-services:
-  auth-db:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_USER: auth
-      POSTGRES_PASSWORD: authsecret
-      POSTGRES_DB: auth_db
-    ports:
-      - "5433:5432" # другой порт, чтобы не конфликтовать
+### Default bootstrap admin
+Compose sets a default admin user:
+- Email: `admin@example.com`
+- Password: `admin12345`
 
-  auth-service:
-    build: .
-    ports:
-      - "8081:8080"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://auth-db:5432/auth_db
-      # ... остальные переменные
-    depends_on:
-      - auth-db
-```
+Override via environment variables:
+- `BOOTSTRAP_ADMIN_EMAIL`
+- `BOOTSTRAP_ADMIN_PASSWORD`
+- `BOOTSTRAP_ADMIN_FULL_NAME`
 
-## Основные эндпоинты
+## API Endpoints
+- `POST /api/v1/auth/sign_up` — registration
+- `POST /api/v1/auth/sign_in` — obtain access + refresh tokens
+- `GET /api/v1/users/me` — current user (JWT required)
+- `GET /api/v1/roles` — list roles (admin)
 
-- POST /api/v1/auth/sign_up — регистрация
-- POST /api/v1/auth/sign_in — получение токенов
-- GET /api/v1/users/me — текущий пользователь (с JWT)
-- GET /api/v1/roles — список ролей (admin)
+Additional management endpoints:
+- `GET /api/v1/permissions` — list permissions
+- `POST /api/v1/permissions` — create permission (admin)
+- `POST /api/v1/roles` — create role (admin)
 
-## Health & Metrics
+## Auth Flow
+1. Sign up with email + password
+2. Sign in to receive `accessToken` and `refreshToken`
+3. Use `Authorization: Bearer <accessToken>` for protected endpoints
 
-/actuator/health
-/actuator/prometheus
+## Observability
+- Prometheus metrics: `GET /actuator/prometheus`
+- Health: `GET /actuator/health`
 
-## Окружения
+Set OTLP endpoint for tracing using:
+- `OTEL_EXPORTER_OTLP_ENDPOINT`
+- `OTEL_SERVICE_NAME`
 
-- local — разработка
-- dev — staging
-- prod — продакшен (secrets via Vault / AWS SSM)
+## Configuration
+Key env vars:
+- `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`
+- `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`
+- `JWT_ACCESS_TTL_MINUTES`, `JWT_REFRESH_TTL_MINUTES`
+- `JWT_ISSUER`
