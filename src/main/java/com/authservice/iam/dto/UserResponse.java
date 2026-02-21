@@ -9,7 +9,6 @@ public record UserResponse(
     UUID id,
     String email,
     String fullName,
-    DepartmentResponse department,
     List<String> roles,
     List<String> permissions,
     JsonNode customClaims

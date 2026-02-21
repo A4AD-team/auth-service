@@ -36,8 +36,6 @@ Override via environment variables:
 - `GET /api/v1/roles` — list roles (admin)
 
 Additional management endpoints:
-- `GET /api/v1/departments` — list departments
-- `POST /api/v1/departments` — create department (admin)
 - `GET /api/v1/permissions` — list permissions
 - `POST /api/v1/permissions` — create permission (admin)
 - `POST /api/v1/roles` — create role (admin)

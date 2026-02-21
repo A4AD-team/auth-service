@@ -3,11 +3,9 @@ package com.authservice.iam.service;
 import com.authservice.iam.dto.AuthTokensResponse;
 import com.authservice.iam.dto.SignInRequest;
 import com.authservice.iam.dto.SignUpRequest;
-import com.authservice.iam.entity.Department;
 import com.authservice.iam.entity.RefreshToken;
 import com.authservice.iam.entity.Role;
 import com.authservice.iam.entity.User;
-import com.authservice.iam.repository.DepartmentRepository;
 import com.authservice.iam.repository.RefreshTokenRepository;
 import com.authservice.iam.repository.RoleRepository;
 import com.authservice.iam.repository.UserRepository;
@@ -28,20 +26,17 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 public class AuthService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final DepartmentRepository departmentRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
     public AuthService(UserRepository userRepository,
                        RoleRepository roleRepository,
-                       DepartmentRepository departmentRepository,
                        RefreshTokenRepository refreshTokenRepository,
                        PasswordEncoder passwordEncoder,
                        JwtService jwtService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
-        this.departmentRepository = departmentRepository;
         this.refreshTokenRepository = refreshTokenRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
@@ -57,17 +52,10 @@ public class AuthService {
         Role defaultRole = roleRepository.findByName("USER")
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Default role USER not found"));
 
-        Department department = null;
-        if (request.departmentId() != null) {
-            department = departmentRepository.findById(request.departmentId())
-                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Department not found"));
-        }
-
         User user = new User();
         user.setEmail(email);
         user.setPasswordHash(passwordEncoder.encode(request.password()));
         user.setFullName(request.fullName());
-        user.setDepartment(department);
         user.getRoles().add(defaultRole);
         User saved = userRepository.save(user);
         return userRepository.findById(saved.getId()).orElse(saved);

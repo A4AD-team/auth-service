@@ -2,10 +2,7 @@ services:
   db:
     image: postgres:16
     container_name: iam-postgres
-    environment:
-      POSTGRES_DB: iam
-      POSTGRES_USER: iam
-      POSTGRES_PASSWORD: iam
+    env_file: .env
     ports:
       - "5432:5432"
     volumes:
@@ -24,22 +21,7 @@ services:
         condition: service_healthy
     ports:
       - "8080:8080"
-    environment:
-      DB_HOST: db
-      DB_PORT: 5432
-      DB_NAME: iam
-      DB_USER: iam
-      DB_PASSWORD: iam
-      JWT_ACCESS_SECRET: changeit-changeit-changeit-changeit
-      JWT_REFRESH_SECRET: changeit-changeit-changeit-changeit-refresh
-      JWT_ACCESS_TTL_MINUTES: 15
-      JWT_REFRESH_TTL_MINUTES: 10080
-      JWT_ISSUER: iam-service
-      BOOTSTRAP_ADMIN_EMAIL: admin@example.com
-      BOOTSTRAP_ADMIN_PASSWORD: admin12345
-      BOOTSTRAP_ADMIN_FULL_NAME: Admin
-      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
-      OTEL_SERVICE_NAME: iam-service
+    env_file: .env
 
 volumes:
   iam-db-data:

@@ -28,10 +28,6 @@ public class User {
     @Column(name = "full_name", length = 190)
     private String fullName;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "department_id")
-    private Department department;
-
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "user_roles",
@@ -82,14 +78,6 @@ public class User {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
-    }
-
-    public Department getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(Department department) {
-        this.department = department;
     }
 
     public Set<Role> getRoles() {

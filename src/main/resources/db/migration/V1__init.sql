@@ -1,12 +1,5 @@
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
-CREATE TABLE departments (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name VARCHAR(120) NOT NULL UNIQUE,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
 CREATE TABLE permissions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(120) NOT NULL UNIQUE,
@@ -34,7 +27,6 @@ CREATE TABLE users (
     email VARCHAR(190) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
     full_name VARCHAR(190),
-    department_id UUID REFERENCES departments(id),
     custom_claims JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()

@@ -56,11 +56,6 @@ public class JwtService {
             .claim("roles", roles)
             .claim("permissions", permissions);
 
-        if (user.getDepartment() != null) {
-            claims.claim("department_id", user.getDepartment().getId().toString());
-            claims.claim("department_name", user.getDepartment().getName());
-        }
-
         if (user.getCustomClaims() != null) {
             claims.claim("custom", user.getCustomClaims());
         }

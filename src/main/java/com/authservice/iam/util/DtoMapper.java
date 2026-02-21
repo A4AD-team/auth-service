@@ -1,10 +1,8 @@
 package com.authservice.iam.util;
 
-import com.authservice.iam.dto.DepartmentResponse;
 import com.authservice.iam.dto.PermissionResponse;
 import com.authservice.iam.dto.RoleResponse;
 import com.authservice.iam.dto.UserResponse;
-import com.authservice.iam.entity.Department;
 import com.authservice.iam.entity.Permission;
 import com.authservice.iam.entity.Role;
 import com.authservice.iam.entity.User;
@@ -18,7 +16,6 @@ public final class DtoMapper {
     }
 
     public static UserResponse toUserResponse(User user) {
-        DepartmentResponse department = user.getDepartment() == null ? null : toDepartmentResponse(user.getDepartment());
         List<String> roles = user.getRoles().stream()
             .map(Role::getName)
             .sorted()
@@ -35,7 +32,6 @@ public final class DtoMapper {
             user.getId(),
             user.getEmail(),
             user.getFullName(),
-            department,
             roles,
             permissionsList,
             user.getCustomClaims()
@@ -52,9 +48,5 @@ public final class DtoMapper {
 
     public static PermissionResponse toPermissionResponse(Permission permission) {
         return new PermissionResponse(permission.getId(), permission.getName(), permission.getDescription());
-    }
-
-    public static DepartmentResponse toDepartmentResponse(Department department) {
-        return new DepartmentResponse(department.getId(), department.getName());
     }
 }
