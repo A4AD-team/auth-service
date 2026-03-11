@@ -32,7 +32,6 @@ public final class DtoMapper {
             user.getId(),
             user.getUsername(),
             user.getEmail(),
-            user.getFullName(),
             roles,
             permissionsList,
             user.getCustomClaims()

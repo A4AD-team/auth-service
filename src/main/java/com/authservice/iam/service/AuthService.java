@@ -60,7 +60,6 @@ public class AuthService {
         user.setEmail(email);
         user.setUsername(username);
         user.setPasswordHash(passwordEncoder.encode(request.password()));
-        user.setFullName(request.fullName());
         user.getRoles().add(defaultRole);
         User saved = userRepository.save(user);
         return userRepository.findById(saved.getId()).orElse(saved);
