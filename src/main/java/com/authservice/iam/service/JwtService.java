@@ -53,6 +53,7 @@ public class JwtService {
             .expiresAt(expiresAt)
             .subject(user.getId().toString())
             .claim("email", user.getEmail())
+            .claim("username", user.getUsername())
             .claim("roles", roles)
             .claim("permissions", permissions);
 
@@ -78,6 +79,7 @@ public class JwtService {
             .subject(user.getId().toString())
             .id(tokenId)
             .claim("email", user.getEmail())
+            .claim("username", user.getUsername())
             .build();
 
         String token = refreshJwtEncoder.encode(
