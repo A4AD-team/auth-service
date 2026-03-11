@@ -30,8 +30,8 @@ public final class DtoMapper {
 
         return new UserResponse(
             user.getId(),
+            user.getUsername(),
             user.getEmail(),
-            user.getFullName(),
             roles,
             permissionsList,
             user.getCustomClaims()

@@ -45,8 +45,12 @@ public class AuthService {
     @Transactional
     public User register(SignUpRequest request) {
         String email = normalizeEmail(request.email());
+        String username = normalizeUsername(request.username());
         if (userRepository.existsByEmail(email)) {
             throw new ResponseStatusException(CONFLICT, "Email already registered");
+        }
+        if (userRepository.existsByUsername(username)) {
+            throw new ResponseStatusException(CONFLICT, "Username already taken");
         }
 
         Role defaultRole = roleRepository.findByName("USER")
@@ -54,8 +58,8 @@ public class AuthService {
 
         User user = new User();
         user.setEmail(email);
+        user.setUsername(username);
         user.setPasswordHash(passwordEncoder.encode(request.password()));
-        user.setFullName(request.fullName());
         user.getRoles().add(defaultRole);
         User saved = userRepository.save(user);
         return userRepository.findById(saved.getId()).orElse(saved);
@@ -64,9 +68,13 @@ public class AuthService {
     @Transactional
     public AuthTokensResponse signIn(SignInRequest request) {
         String email = normalizeEmail(request.email());
+        String username = normalizeUsername(request.username());
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new ResponseStatusException(UNAUTHORIZED, "Invalid credentials"));
 
+        if (!user.getUsername().equals(username)) {
+            throw new ResponseStatusException(UNAUTHORIZED, "Invalid credentials");
+        }
         if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
             throw new ResponseStatusException(UNAUTHORIZED, "Invalid credentials");
         }
@@ -92,5 +100,9 @@ public class AuthService {
 
     private String normalizeEmail(String email) {
         return email == null ? null : email.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private String normalizeUsername(String username) {
+        return username == null ? null : username.trim().toLowerCase(Locale.ROOT);
     }
 }
