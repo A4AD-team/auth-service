@@ -22,11 +22,11 @@ public class User {
     @Column(nullable = false, unique = true, length = 190)
     private String email;
 
+    @Column(nullable = false, unique = true, length = 190)
+    private String username;
+
     @Column(name = "password_hash", nullable = false, length = 255)
     private String passwordHash;
-
-    @Column(name = "full_name", length = 190)
-    private String fullName;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -64,20 +64,20 @@ public class User {
         this.email = email;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
     public String getPasswordHash() {
         return passwordHash;
     }
 
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
     }
 
     public Set<Role> getRoles() {

@@ -40,12 +40,23 @@ public class DataInitializer {
                 if (admin == null) {
                     admin = new User();
                     admin.setEmail(email);
+                    admin.setUsername(deriveUsername(email));
                     admin.setPasswordHash(passwordEncoder.encode(adminProperties.getPassword()));
-                    admin.setFullName(adminProperties.getFullName());
+                }
+                if (admin.getUsername() == null || admin.getUsername().isBlank()) {
+                    admin.setUsername(deriveUsername(email));
                 }
                 admin.getRoles().add(adminRole);
                 userRepository.save(admin);
             }
         };
+    }
+
+    private String deriveUsername(String email) {
+        if (email == null) {
+            return null;
+        }
+        String localPart = email.split("@", 2)[0];
+        return localPart.trim().toLowerCase(Locale.ROOT);
     }
 }
